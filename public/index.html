@@ -18,7 +18,7 @@
         <p id="size-display" class="text-center mt-2">Size: 24px</p>
       </div>
       <div>
-        <label for="color-picker" class="block mb-2 text-center">SVG Fill Color:</label>
+        <label for="color-picker" class="block mb-2 text-center">SVG Color:</label>
         <input id="color-picker" type="color" value="#000000" class="w-full h-10">
       </div>
     </div>
@@ -58,11 +58,18 @@
           svgElement.style.width = `${size}px`;
           svgElement.style.height = `${size}px`;
 
-          // Set fill color to the selected color
+          // Set fill and stroke colors to the selected color
           svgElement.querySelectorAll('[fill]').forEach(elem => elem.setAttribute('fill', color)); // Change fill color if present
+          svgElement.querySelectorAll('[stroke]').forEach(elem => elem.setAttribute('stroke', color)); // Change stroke color if present
 
+          // If no fill attribute found, set it on the <svg>
           if (!svgElement.hasAttribute('fill')) {
-            svgElement.setAttribute('fill', color); // If no fill attribute found, set it on the <svg>
+            svgElement.setAttribute('fill', color);
+          }
+
+          // If no stroke attribute found, set it on the <svg>
+          if (!svgElement.hasAttribute('stroke')) {
+            svgElement.setAttribute('stroke', color);
           }
 
           // Create a container div to hold both the SVG and the file name
