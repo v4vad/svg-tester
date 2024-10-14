@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="style.css" rel="stylesheet">
+  <title>SVG Tester with Folder Upload</title>
+</head>
+<body class="bg-gray-100 p-10">
+  <div class="container mx-auto">
+    <h1 class="text-2xl font-bold mb-4">SVG Tester with Folder Upload</h1>
+
+    <!-- Controls for scaling and color -->
+    <div class="mb-8 flex space-x-4">
+      <div>
+        <label for="size-select" class="block mb-2">Select Icon Size:</label>
+        <select id="size-select" class="w-full">
+          <option value="12">12px</option>
+          <option value="16">16px</option>
+          <option value="20">20px</option>
+          <option value="24">24px</option>
+          <option value="32">32px</option>
+          <option value="48">48px</option>
+          <option value="64">64px</option>
+          <option value="72">72px</option>
+          <option value="96">96px</option>
+          <option value="128">128px</option>
+        </select>
+      </div>
+      <div>
+        <label for="color-picker" class="block mb-2">SVG Fill Color:</label>
+        <input id="color-picker" type="color" value="#000000" class="w-full h-10">
+      </div>
+    </div>
+
+    <!-- Upload input -->
+    <div class="mb-8">
+      <label for="svg-upload" class="block mb-2">Upload Folder of SVGs:</label>
+      <input id="svg-upload" type="file" webkitdirectory directory multiple accept=".svg" class="block w-full" />
+    </div>
+
+    <!-- SVG Grid -->
+    <div id="svg-grid" class="grid grid-cols-6 gap-4 bg-white p-4 border rounded shadow-lg"></div>
+  </div>
+
+  <script>
+    const svgGrid = document.getElementById('svg-grid');
+    const sizeSelect = document.getElementById('size-select');
+    const colorPicker = document.getElementById('color-picker');
+    const svgUpload = document.getElementById('svg-upload');
+
+    let uploadedSVGs = []; // To hold the uploaded SVG files
+
+    // Function to load and display SVGs
+    function loadSVGs(size, color) {
+      svgGrid.innerHTML = ''; // Clear the grid
+      uploadedSVGs.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const svgContainer = document.createElement('div');
+          svgContainer.innerHTML = e.target.result;
+
+          const svgElement = svgContainer.querySelector('svg');
+          svgElement.classList.add('w-full', 'h-auto'); // Ensure responsive
+          
+          // Set the width and height to the selected size (px)
+          svgElement.style.width = `${size}px`;
+          svgElement.style.height = `${size}px`;
+
+          // Set fill color to the selected color
+          svgElement.querySelectorAll('[fill]').forEach(elem => elem.setAttribute('fill', color)); // Change fill color if present
+          
+          // If no fill attribute is found, set it directly on the <svg> tag
+          if (!svgElement.hasAttribute('fill')) {
+            svgElement.setAttribute('fill', color);
+          }
+
+          const container = document.createElement('div');
+          container.appendChild(svgElement);
+          svgGrid.appendChild(container);
+        };
+        reader.readAsText(file); // Read the SVG file content
+      });
+    }
+
+    // Handle SVG folder upload
+    svgUpload.addEventListener('change', function(event) {
+      uploadedSVGs = Array.from(event.target.files).filter(file => file.type === 'image/svg+xml');
+      loadSVGs(sizeSelect.value, colorPicker.value); // Load uploaded SVGs immediately
+    });
+
+    // Update SVG size when the select input changes
+    sizeSelect.addEventListener('change', () => {
+      loadSVGs(sizeSelect.value, colorPicker.value);
+    });
+
+    // Update SVG color when the color picker changes
+    colorPicker.addEventListener('input', () => {
+      loadSVGs(sizeSelect.value, colorPicker.value);
+    });
+  </script>
+</body>
+</html>
