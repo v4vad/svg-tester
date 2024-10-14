@@ -58,18 +58,16 @@
           svgElement.style.width = `${size}px`;
           svgElement.style.height = `${size}px`;
 
-          // Set fill and stroke colors to the selected color
-          svgElement.querySelectorAll('[fill]').forEach(elem => elem.setAttribute('fill', color)); // Change fill color if present
-          svgElement.querySelectorAll('[stroke]').forEach(elem => elem.setAttribute('stroke', color)); // Change stroke color if present
-
-          // If no fill attribute found, set it on the <svg>
-          if (!svgElement.hasAttribute('fill')) {
-            svgElement.setAttribute('fill', color);
+          // Set fill color only if fill is defined in the SVG
+          const hasFill = svgElement.querySelector('[fill]');
+          if (hasFill) {
+            svgElement.querySelectorAll('[fill]').forEach(elem => elem.setAttribute('fill', color));
           }
 
-          // If no stroke attribute found, set it on the <svg>
-          if (!svgElement.hasAttribute('stroke')) {
-            svgElement.setAttribute('stroke', color);
+          // Set stroke color only if stroke is defined in the SVG
+          const hasStroke = svgElement.querySelector('[stroke]');
+          if (hasStroke) {
+            svgElement.querySelectorAll('[stroke]').forEach(elem => elem.setAttribute('stroke', color));
           }
 
           // Create a container div to hold both the SVG and the file name
