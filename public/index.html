@@ -6,31 +6,46 @@
   <link href="style.css" rel="stylesheet">
   <title>SVG Tester</title>
 </head>
-<body class="bg-gray-100 p-10">
-  <div class="container mx-auto">
-    <h1 class="text-2xl font-bold mb-4 text-center">SVG Tester</h1>
+<body class="bg-gray-100 p-4 sm:p-6 md:p-8 lg:p-10">
+  <div class="container mx-auto max-w-7xl">
+    <h1 class="text-xl sm:text-2xl font-bold mb-4 text-center">SVG Tester</h1>
 
-    <!-- Controls for scaling and color -->
-    <div class="mb-8 flex flex-wrap justify-center space-x-4">
-      <div>
-        <label for="size-slider" class="block mb-2 text-center">Icon Size:</label>
-        <input id="size-slider" type="range" min="12" max="128" step="4" value="24" class="w-full" />
-        <p id="size-display" class="text-center mt-2">Size: 24px</p>
+    <!-- Zero State Message -->
+    <div id="zero-state" class="mb-6 sm:mb-8 text-center">
+      <h2 class="text-gray-600 text-sm sm:text-base">how to use</h2>
+      <p class="text-gray-600 text-sm sm:text-base">upload a folder of icons</p>
+      <p class="text-gray-600 text-sm sm:text-base">adjust sizes and colors</p>
+      <p class="text-gray-600 text-sm sm:text-base">currently does not support multicolour icons</p>
+    </div>
+
+    <!-- Upload input and controls wrapper -->
+    <div class="mb-6 sm:mb-8 flex flex-col sm:flex-row items-start justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+      <!-- Upload input -->
+      <div class="w-full sm:w-auto text-center">
+        <label for="svg-upload" class="bg-slate-900 hover:bg-slate-700 inline-block w-full sm:w-auto p-2 sm:p-3 md:p-4 text-white text-sm sm:text-base rounded-lg cursor-pointer transition-all duration-300">
+          Upload SVG
+          <input id="svg-upload" type="file" webkitdirectory directory multiple accept=".svg" class="hidden" />
+        </label>
       </div>
-      <div>
-        <label for="color-picker" class="block mb-2 text-center">SVG Color:</label>
-        <input id="color-picker" type="color" value="#000000" class="w-full h-10">
+      
+      <!-- Controls for scaling and color -->
+      <div class="w-full sm:flex-grow flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-4 hidden" id="controls">
+        <div class="w-full sm:w-1/2">
+          <label for="size-slider" class="block mb-2 text-sm sm:text-base">Icon Size:</label>
+          <input id="size-slider" type="range" min="12" max="128" step="4" value="24" class="w-full" />
+          <p id="size-display" class="mt-2 text-sm sm:text-base">Size: 24px</p>
+        </div>
+        <div class="w-full sm:w-1/2">
+          <label for="color-picker" class="block mb-2 text-sm sm:text-base">SVG Color:</label>
+          <input id="color-picker" type="color" value="#000000" class="w-full h-8 sm:h-10">
+        </div>
       </div>
     </div>
 
-    <!-- Upload input -->
-    <div class="mb-8 text-center">
-      <label for="svg-upload" class="block mb-2">Upload Folder of SVGs:</label>
-      <input id="svg-upload" type="file" webkitdirectory directory multiple accept=".svg" class="block w-full" />
-    </div>
+    
 
     <!-- SVG Grid -->
-    <div id="svg-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 bg-white p-4 border rounded shadow-lg"></div>
+    <div id="svg-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 sm:gap-4 bg-white p-2 sm:p-4 border rounded hidden"></div>
   </div>
 
   <script>
@@ -39,11 +54,16 @@
     const sizeDisplay = document.getElementById('size-display');
     const colorPicker = document.getElementById('color-picker');
     const svgUpload = document.getElementById('svg-upload');
+    const zeroState = document.getElementById('zero-state');
+    const uploadLabel = document.getElementById('upload-label');
+    const controls = document.getElementById('controls');
 
     let uploadedSVGs = []; // To hold the uploaded SVG files
 
     // Function to load and display SVGs
     function loadSVGs(size, color) {
+      svgGrid.classList.remove('hidden'); // Show the SVG grid
+
       svgGrid.innerHTML = ''; // Clear the grid
       uploadedSVGs.forEach(file => {
         const reader = new FileReader();
@@ -80,7 +100,7 @@
           // Create a paragraph to display the file name (without .svg extension)
           const fileName = document.createElement('p');
           fileName.textContent = file.name.replace('.svg', ''); // Strip .svg from the file name
-          fileName.classList.add('text-sm', 'mt-2', 'text-gray-600', 'text-center'); // Style the file name text
+          fileName.classList.add('text-xs', 'sm:text-sm', 'mt-1', 'sm:mt-2', 'text-gray-600', 'text-center', 'truncate', 'w-full'); // Style the file name text
 
           // Append the file name below the SVG
           container.appendChild(fileName);
@@ -95,6 +115,17 @@
     // Handle SVG folder upload
     svgUpload.addEventListener('change', function(event) {
       uploadedSVGs = Array.from(event.target.files).filter(file => file.type === 'image/svg+xml');
+      if (uploadedSVGs.length > 0) {
+        // Hide zero state message
+        zeroState.classList.add('hidden');
+
+        // Shrink the upload button
+        svgUpload.classList.replace('p-4', 'p-2');
+        svgUpload.classList.replace('text-lg', 'text-sm');
+
+        // Show controls
+        controls.classList.remove('hidden');
+      }
       loadSVGs(sizeSlider.value, colorPicker.value); // Load uploaded SVGs immediately
     });
 
